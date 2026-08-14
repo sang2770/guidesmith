@@ -163,6 +163,58 @@ has is what guidesmith uses.
 every captured screenshot must be referenced exactly once with non-empty alt text. Output
 that fails falls back to the deterministic renderer (`--strict` makes it an error instead).
 
+## Driving guidesmith from an agent
+
+`guidesmith init` writes `AGENTS.md` into your docs project. Codex and Antigravity both read
+it automatically, so the agent starts out knowing the pipeline and the rules.
+
+There are two ways to combine an agent with the toolkit, and they use the same flow specs:
+
+| | Who writes the prose | When to use |
+| --- | --- | --- |
+| **Mode A** | The agent itself, into the flow spec's `note:` fields — then `generate --no-ai` renders it | You are working in the IDE/CLI anyway. No extra model CLI needed |
+| **Mode B** | `guidesmith generate --provider codex\|claude\|gemini` | CI, or batch-regenerating many guides without an agent session |
+
+In Mode A the prose must go in the **flow spec**, not the MDX: `generate` overwrites
+`site/docs/guides/*.mdx` on every run, so text typed straight into the MDX is lost.
+
+### Codex
+
+```bash
+cd ~/acme-docs
+
+# Interactive. The workspace sandbox blocks the network by default, and capture
+# has to reach your app on localhost — so turn network access on:
+codex -c sandbox_workspace_write.network_access=true
+
+# Non-interactive, same idea:
+codex exec -s workspace-write -c 'sandbox_workspace_write.network_access=true' \
+  "Document the sign-in journey for http://localhost:3000. Follow AGENTS.md."
+```
+
+Then prompt it to run `guidesmith explore` → write `flows/<id>.flow.yaml` → `lint` →
+`capture` → `generate --no-ai`.
+
+| Symptom | Fix |
+| --- | --- |
+| `capture` fails with a connection error or `EAI_AGAIN` | The sandbox is blocking localhost. Add `-c sandbox_workspace_write.network_access=true` |
+| Network still blocked on macOS | Known seatbelt bug — `network_access` is ignored. Run `guidesmith capture` in your own terminal, and let Codex do the rest |
+| An approval prompt for every command | You are in `read-only`/`untrusted`. Switch to `approval_policy = "on-request"` + `sandbox_mode = "workspace-write"` |
+
+Mode B (`--provider codex`) shells out to `codex exec`. Don't use it from *inside* a Codex
+session — you would be nesting one agent in another. Use Mode A there instead.
+
+### Antigravity
+
+Open the docs project as the workspace, add `guidesmith capture|generate|lint|explore|verify`
+to the terminal Allow list in Agent Settings, then drive it from the Agent Manager.
+
+Antigravity's own browser screenshots are **artifacts for your review** — they cannot be
+regenerated or diffed, so never paste one into a guide. The shipped screenshots always come
+from `guidesmith capture`.
+
+Full walkthrough, including a ready-made subagent definition: [ANTIGRAVITY.md](ANTIGRAVITY.md).
+
 ## Keeping guides honest in CI
 
 ```yaml
