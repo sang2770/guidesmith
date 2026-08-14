@@ -1,0 +1,26 @@
+{
+  "name": "guidesmith",
+  "version": "0.1.0",
+  "description": "AI-agent toolkit for building step-by-step user guides: Playwright captures the screens, an AI model writes the prose, Docusaurus ships the site.",
+  "type": "module",
+  "bin": {
+    "guidesmith": "./bin/guidesmith.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "guidesmith": "node ./bin/guidesmith.mjs",
+    "demo": "bash examples/demo.sh",
+    "demo:build": "bash examples/demo.sh --build"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.1",
+    "pixelmatch": "^6.0.0",
+    "playwright": "^1.55.0",
+    "pngjs": "^7.0.0",
+    "yaml": "^2.6.1"
+  },
+  "license": "MIT"
+}

@@ -1,0 +1,56 @@
+# Publish a guidesmith docs site to GitHub Pages.
+#
+# Copy to .github/workflows/docs.yml in your documentation project, then enable
+# Settings → Pages → Source: GitHub Actions.
+#
+# Set these in site/docusaurus.config.js first:
+#   url: 'https://<account>.github.io'
+#   baseUrl: '/<repository-name>/'
+name: Publish docs
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      # Screenshots are committed, so the site builds without launching a browser.
+      - name: Install site dependencies
+        run: npm --prefix site ci
+
+      - name: Build the site
+        run: npm --prefix site run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/build
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

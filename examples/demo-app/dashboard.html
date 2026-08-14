@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Acme Console — Dashboard</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="brand"><span class="dot"></span> Acme Console</div>
+      <nav>
+        <a href="dashboard.html" class="active">Dashboard</a>
+        <a href="#projects">Projects</a>
+        <a href="#settings">Settings</a>
+      </nav>
+      <div class="account" id="account">signed in</div>
+    </header>
+
+    <main class="page">
+      <h1>Dashboard</h1>
+      <p class="muted">Everything your team is working on, in one place.</p>
+
+      <section class="panel">
+        <h2>Create a project</h2>
+        <form id="new-project">
+          <label for="project-name">Project name</label>
+          <input id="project-name" name="name" type="text" placeholder="Marketing site" required />
+
+          <label for="visibility">Visibility</label>
+          <select id="visibility" name="visibility">
+            <option value="private">Private</option>
+            <option value="team">Team</option>
+            <option value="public">Public</option>
+          </select>
+
+          <button type="submit">Create project</button>
+        </form>
+      </section>
+
+      <section class="panel">
+        <h2>Your projects</h2>
+        <ul id="projects" class="list">
+          <li class="empty">No projects yet.</li>
+        </ul>
+      </section>
+    </main>
+
+    <script>
+      const user = sessionStorage.getItem('acme-user');
+      if (user) document.getElementById('account').textContent = user;
+
+      document.getElementById('new-project').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const name = document.getElementById('project-name').value.trim();
+        const visibility = document.getElementById('visibility').value;
+        if (!name) return;
+        const list = document.getElementById('projects');
+        list.querySelector('.empty')?.remove();
+        const li = document.createElement('li');
+        li.innerHTML = `<strong>${name}</strong> <span class="tag">${visibility}</span>`;
+        list.appendChild(li);
+        e.target.reset();
+      });
+    </script>
+  </body>
+</html>

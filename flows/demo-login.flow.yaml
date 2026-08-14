@@ -1,0 +1,69 @@
+# Demo flow for examples/demo-app.
+#   python3 -m http.server 4173 --directory examples/demo-app
+#   guidesmith capture --flow flows/demo-login.flow.yaml
+id: sign-in-and-create-a-project
+title: Sign in and create your first project
+description: Get into Acme Console and set up a project your team can work in.
+audience: first-time users
+sidebarPosition: 1
+tags: [getting-started]
+baseUrl: http://localhost:4173
+prerequisites:
+  - An invitation email from your workspace admin
+
+steps:
+  - name: Open the sign-in page
+    action: goto
+    url: /index.html
+    note: Go to the Acme Console sign-in page. Bookmark it — this is where you start every time.
+
+  - name: Enter your email address
+    action: fill
+    label: Email
+    value: you@example.com
+    note: Type the address your invitation was sent to.
+
+  - name: Enter your password
+    action: fill
+    label: Password
+    value: correct-horse-battery
+    secret: true
+    note: Passwords are case sensitive.
+    callout:
+      type: tip
+      text: Forgotten it? Select "Reset password" under the form and we will email you a link.
+
+  - name: Stay signed in on this device
+    action: check
+    label: Keep me signed in
+    optional: true
+    note: Tick this only on a device that is yours alone.
+
+  - name: Select Sign in
+    action: click
+    role: { role: button, name: Sign in }
+    result: The dashboard opens and your email address appears in the top-right corner.
+
+  - name: Name your project
+    action: fill
+    label: Project name
+    value: Marketing site
+    note: Use something your teammates will recognise — you can rename it later.
+
+  - name: Choose who can see it
+    action: select
+    label: Visibility
+    value: team
+    note: "Team means everyone in your workspace can open the project. Private keeps it to you."
+
+  - name: Select Create project
+    action: click
+    role: { role: button, name: Create project }
+    result: The project appears under "Your projects".
+
+  - name: Confirm the project was created
+    action: expect
+    selector: "#projects li"
+    value: Marketing site
+    highlight: "#projects"
+    note: Your new project is listed with its visibility tag.
