@@ -37,6 +37,7 @@ falls back to a deterministic renderer that writes the guide straight from the f
 
 **New here?** [GETTING_STARTED.md](GETTING_STARTED.md) is the 11-step walkthrough, from an
 empty folder to a published site. This README is the reference.
+Driving it from an agent IDE? See [ANTIGRAVITY.md](ANTIGRAVITY.md).
 
 ## Quick start
 
